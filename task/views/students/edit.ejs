@@ -1,0 +1,202 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-edit me-2"></i>Edit Student</h1>
+    <div>
+        <a href="/students/<%= student._id %>" class="btn btn-info me-2">
+            <i class="fas fa-eye me-2"></i>View
+        </a>
+        <a href="/students" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Students
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-edit me-2"></i>Editing: <%= student.fullName %>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form action="/students/<%= student._id %>/update" method="POST" novalidate>
+                    <input type="hidden" name="_method" value="PUT">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">First Name *</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" 
+                                   value="<%= student.firstName %>" maxlength="50" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" 
+                                   value="<%= student.lastName %>" maxlength="50" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="<%= student.email %>" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="studentId" class="form-label">Student ID *</label>
+                            <input type="text" class="form-control" id="studentId" name="studentId" 
+                                   value="<%= student.studentId %>" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="age" class="form-label">Age *</label>
+                            <input type="number" class="form-control" id="age" name="age" 
+                                   value="<%= student.age %>" min="16" max="100" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="major" class="form-label">Major *</label>
+                            <input type="text" class="form-control" id="major" name="major" 
+                                   value="<%= student.major %>" maxlength="100" list="majors" required>
+                            <datalist id="majors">
+                                <option value="Computer Science">
+                                <option value="Engineering">
+                                <option value="Business Administration">
+                                <option value="Mathematics">
+                                <option value="Biology">
+                                <option value="Chemistry">
+                                <option value="Physics">
+                                <option value="Psychology">
+                                <option value="English Literature">
+                                <option value="History">
+                            </datalist>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="gpa" class="form-label">GPA</label>
+                            <input type="number" class="form-control" id="gpa" name="gpa" 
+                                   value="<%= student.gpa %>" min="0" max="4" step="0.01">
+                            <div class="form-text">Optional (0.00 - 4.00)</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="enrollmentDate" class="form-label">Enrollment Date</label>
+                            <input type="date" class="form-control" id="enrollmentDate" name="enrollmentDate" 
+                                   value="<%= student.enrollmentDate.toISOString().split('T')[0] %>" readonly>
+                            <div class="form-text">This field is read-only</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" class="form-check-input" id="isActive" name="isActive" 
+                                       <%= student.isActive ? 'checked' : '' %>>
+                                <label class="form-check-label" for="isActive">
+                                    <strong>Active Student</strong>
+                                </label>
+                                <div class="form-text">Uncheck to mark student as inactive</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            <small>
+                                <i class="fas fa-info-circle me-1"></i>
+                                Last updated: <%= new Date(student.updatedAt).toLocaleString() %>
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/students/<%= student._id %>" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Update Student
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        
+        <div class="card mt-4 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="text-danger mb-3">
+                    <strong>Delete this student permanently.</strong> This action cannot be undone.
+                </p>
+                <form method="POST" action="/students/<%= student._id %>/delete" class="d-inline"
+                      onsubmit="return confirmDelete('<%= student.fullName %>')">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Delete Student
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+   
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const requiredFields = ['firstName', 'lastName', 'email', 'studentId', 'age', 'major'];
+        let isValid = true;
+
+        requiredFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            const value = field.value.trim();
+            
+            
+            field.classList.remove('is-valid', 'is-invalid');
+            
+            if (!value) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.add('is-valid');
+            }
+        });
+
+        const email = document.getElementById('email');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email.value && !emailRegex.test(email.value)) {
+            email.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const age = document.getElementById('age');
+        if (age.value && (age.value < 16 || age.value > 100)) {
+            age.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        const gpa = document.getElementById('gpa');
+        if (gpa.value && (gpa.value < 0 || gpa.value > 4)) {
+            gpa.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    document.querySelectorAll('input:not([readonly])').forEach(input => {
+        input.addEventListener('blur', function() {
+            this.classList.remove('is-valid', 'is-invalid');
+            if (this.value.trim()) {
+                this.classList.add('is-valid');
+            }
+        });
+    });
+</script>
+
+<%- include('../partials/footer') %>

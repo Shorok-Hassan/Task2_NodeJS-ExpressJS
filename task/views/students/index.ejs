@@ -1,0 +1,159 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-users me-2"></i>Students (<%= totalStudents %>)</h1>
+    <a href="/students/create" class="btn btn-primary">
+        <i class="fas fa-user-plus me-2"></i>Add New Student
+    </a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="/students" class="row g-3">
+            <div class="col-md-6">
+                <label for="search" class="form-label">Search Students</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="<%= search %>" placeholder="Search by name or major...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="major" class="form-label">Filter by Major</label>
+                <select class="form-select" id="major" name="major">
+                    <option value="all" <%= selectedMajor === 'all' ? 'selected' : '' %>>All Majors</option>
+                    <% majors.forEach(major => { %>
+                        <option value="<%= major %>" <%= selectedMajor === major ? 'selected' : '' %>>
+                            <%= major %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="/students" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <% if (students.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Major</th>
+                            <th>Age</th>
+                            <th>GPA</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% students.forEach(student => { %>
+                            <tr>
+                                <td><%= student.studentId %></td>
+                                <td>
+                                    <strong><%= student.fullName %></strong>
+                                </td>
+                                <td><%= student.email %></td>
+                                <td>
+                                    <span class="badge bg-info"><%= student.major %></span>
+                                </td>
+                                <td><%= student.age %></td>
+                                <td>
+                                    <% if (student.gpa >= 3.5) { %>
+                                        <span class="badge bg-success"><%= student.gpa.toFixed(2) %></span>
+                                    <% } else if (student.gpa >= 3.0) { %>
+                                        <span class="badge bg-warning text-dark"><%= student.gpa.toFixed(2) %></span>
+                                    <% } else { %>
+                                        <span class="badge bg-danger"><%= student.gpa.toFixed(2) %></span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (student.isActive) { %>
+                                        <span class="badge bg-success">Active</span>
+                                    <% } else { %>
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="/students/<%= student._id %>" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/students/<%= student._id %>/edit" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="POST" action="/students/<%= student._id %>/delete" class="d-inline"
+                                              onsubmit="return confirmDelete('<%= student.fullName %>')">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <nav aria-label="Students pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <% if (hasPrevPage) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>&major=<%= selectedMajor %>">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        <% } %>
+                        
+                        <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>&search=<%= search %>&major=<%= selectedMajor %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                        
+                        <% if (hasNextPage) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>&major=<%= selectedMajor %>">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            <% } %>
+        <% } else { %>
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No students found</h4>
+                <p class="text-muted">
+                    <% if (search || selectedMajor !== 'all') { %>
+                        No students match your search criteria.
+                        <a href="/students" class="btn btn-sm btn-outline-primary">Clear filters</a>
+                    <% } else { %>
+                        Get started by adding your first student.
+                    <% } %>
+                </p>
+                <a href="/students/create" class="btn btn-primary">
+                    <i class="fas fa-user-plus me-2"></i>Add First Student
+                </a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
